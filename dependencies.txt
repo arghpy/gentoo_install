@@ -40,7 +40,6 @@ xfce-base/thunar
 media-gfx/sxiv
 media-video/vlc
 sys-devel/bc
-app-misc/brightnessctl
 media-sound/pavucontrol
 net-wireless/blueman
 app-text/zathura

@@ -183,7 +183,7 @@ mounting() {
 }
 
 # Configuring date
-date() {
+date_config() {
     log_info "Configuring data with chrony"
     chronyd -q
     log_ok "DONE"
@@ -289,7 +289,7 @@ disks
 partitioning
 formatting
 mounting
-date
+date_config
 download_and_configure_stage3
 make_conf_portage
 select_mirrors

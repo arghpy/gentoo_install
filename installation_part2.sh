@@ -213,7 +213,7 @@ install_packages() {
     log_info "Install packages"
     wget "${DEP_FILE}"
     DEPLIST="$(sed -e 's/#.*$//' -e '/^$/d' dependencies.txt | tr '\n' ' ')"
-    emerge -q "${DEPLIST}"
+    emerge --autounmask-continue -q "${DEPLIST}"
     log_ok "DONE"
 }
 
