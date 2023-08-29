@@ -5,17 +5,21 @@ x11-base/xorg-server
 x11-libs/libXrandr
 x11-libs/libXinerama
 x11-libs/libXft
+x11-libs/libnotify
 x11-apps/xinit
 x11-apps/xrdb
-x11-apps/mesa-progs
 x11-apps/xrandr
-x11-drivers/xf86-video-vboxvideo
-x11-drivers/nvidia-drivers
-x11-misc/unclutter
 x11-misc/xclip
-x11-misc/pcmanfm
-x11-terms/rxvt-unicode
+x11-misc/xdotool
+x11-misc/picom
+x11-misc/dunst
+x11-misc/xwallpaper
+x11-misc/lightdm
+x11-misc/lightdm-gtk-greeter
 x11-apps/xbacklight
+x11-apps/xwininfo
+x11-apps/xprop
+x11-apps/xinput
 
 #misc
 app-editors/neovim
@@ -25,7 +29,20 @@ media-sound/alsa-utils
 www-client/firefox-bin
 
 #fonts
+media-fonts/jetbrains-mono
 
-#libs
-dev-libs/libltdl
-media-libs/libv4l
+#others
+sys-firmware/sof-firmware
+net-wireless/bluez
+dev-vcs/git
+media-gfx/maim
+xfce-base/thunar
+media-gfx/sxiv
+media-video/vlc
+sys-devel/bc
+app-misc/brightnessctl
+media-sound/pavucontrol
+net-wireless/blueman
+app-text/zathura
+app-admin/sudo
+app-shells/zsh

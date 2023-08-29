@@ -192,10 +192,11 @@ date() {
 # Downloading and unarchiving stage3 tarball
 download_and_configure_stage3() {
     log_info "Downloading and setting stage3 tarball"
+    STAGE="https://distfiles.gentoo.org/releases/amd64/autobuilds/20230827T170145Z/stage3-amd64-desktop-openrc-20230827T170145Z.tar.xz"
 
     pushd /mnt/gentoo
 
-    wget "https://distfiles.gentoo.org/releases/amd64/autobuilds/20230827T170145Z/stage3-amd64-openrc-20230827T170145Z.tar.xz"
+    wget "${STAGE}"
     tar xpvf stage3-*.tar.xz --xattrs-include='*.*' --numeric-owner
     wait
     rm stage3-*.tar.xz
@@ -212,15 +213,17 @@ make_conf_portage() {
     MAKE_CONF="/mnt/gentoo/etc/portage/make.conf"
 
     COMMON_FLAGS_OLD="$(grep "^COMMON_FLAGS=" "${MAKE_CONF}")"
-    COMMON_FLAGS_NEW="-march=native -O2 -pipe"
+    COMMON_FLAGS_NEW="COMMON_FLAGS=\"-march=native -O2 -pipe\""
     CORES="$(nproc)"
-    MAKEOPTS="-j${CORES}"
+    MAKEOPTS="MAKEOPTS=\"-j${CORES}\""
+    USE="USE=\"X acl alsa\""
 
     # Changing COMMON_FLAGS
     sed -i "s|${COMMON_FLAGS_OLD}|${COMMON_FLAGS_NEW}|g" "${MAKE_CONF}"
 
     # Appending MAKEOPTS
     echo "${MAKEOPTS}" >> "${MAKE_CONF}"
+    echo "${USE}" >> "${MAKE_CONF}"
 
     log_ok "DONE"
 }
@@ -275,7 +278,7 @@ enter_environment() {
     log_ok "DONE"
 
     log_info "Entering the new environment"
-    log_info "Run the second part of the script: 'installation_part2.sh'"
+    log_info "Run the second part of the script: 'installation_part2.sh ${MODE} ${DISK}'"
     chroot /mnt/gentoo /bin/bash
 }
 
