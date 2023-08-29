@@ -198,7 +198,6 @@ download_and_configure_stage3() {
 
     wget "${STAGE}"
     tar xpvf stage3-*.tar.xz --xattrs-include='*.*' --numeric-owner
-    wait
     rm stage3-*.tar.xz
 
     popd
