@@ -241,7 +241,12 @@ grub() {
 set_user() {
     log_info "Setting user account"
 
-	NAME=$(whiptail --inputbox "Please enter a name for the user account." 10 60 3>&1 1>&2 2>&3 3>&1) || exit -1
+    NAME=""
+
+    while [-z "${NAME}" ]; do
+        printf "Enter name for the local user: "
+        read NAME
+    done
 
     log_info "Adding user to users, audio, video and wheel group"
 	useradd -m -g wheel,users,audio,video -s /bin/zsh "${NAME}"
