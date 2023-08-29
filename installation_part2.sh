@@ -4,7 +4,7 @@ MODE="${1}"
 DISK="${2}"
 
 LOG_FUNC="https://raw.githubusercontent.com/arghpy/functions/main/log_functions.sh"
-DEP_FILE="https://raw.githubusercontent.com/arghpy/gentoo_installation/main/dependencies.txt"
+DEP_FILE="https://raw.githubusercontent.com/arghpy/gentoo_install/main/dependencies.txt"
 
 # Sourcing log functions
 wget "${LOG_FUNC}"
