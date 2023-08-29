@@ -220,6 +220,7 @@ install_packages() {
 # Installing grub and creating configuration
 grub() {
     log_info "Installing and configuring grub"
+    mount_boot 
 	if [[ "${MODE}" == "UEFI" ]]; then
         echo 'GRUB_PLATFORMS="efi-64"' >> /etc/portage/make.conf
         emerge -q sys-boot/grub
