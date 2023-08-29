@@ -59,8 +59,6 @@ n      # add new partition
        # default - first sector
 +1G    # partition size
 y      # to remove signature if it is the case
-       # if there is a need to press enter
-       # if there is a need to press enter
 t      # to change the type of the partition
 1      # if there is a need to press enter
        # if there is a need to press enter
@@ -70,8 +68,6 @@ n      # add new partition
        # partition number
 +4G    # partition size
 y      # to remove signature if it is the case
-       # if there is a need to press enter
-       # if there is a need to press enter
 t      # to change the type of the partition
 2      # select the second partition
 19     # swap partition type
@@ -82,15 +78,11 @@ n      # add new partition
        # default - first sector
 +30G   # default - last sector
 y      # to remove signature if it is the case
-       # if there is a need to press enter
-       # if there is a need to press enter
 n      # change partition type
        # partition number
        # default - first sector
        # default - last sector
 y      # to remove signature if it is the case
-       # if there is a need to press enter
-       # if there is a need to press enter
 w      # write partition table and exit
 FDISK_CMDS
 
@@ -106,15 +98,11 @@ n      # add new partition
        # default - first sector
 +1G    # partition size
 y      # to remove signature if it is the case
-       # if there is a need to press enter
-       # if there is a need to press enter
 n      # add new partition
        # partition type
        # partition number
 +4G    # partition size
 y      # to remove signature if it is the case
-       # if there is a need to press enter
-       # if there is a need to press enter
 t      # to change the type of the partition
 2      # select the second partition
 19     # swap partition type
@@ -125,19 +113,16 @@ n      # add new partition
        # default - first sector
 +30G   # default - last sector
 y      # to remove signature if it is the case
-       # if there is a need to press enter
-       # if there is a need to press enter
 n      # change partition type
        # partition number
        # default - first sector
        # default - last sector
 y      # to remove signature if it is the case
-       # if there is a need to press enter
-       # if there is a need to press enter
 w      # write partition table and exit
 FDISK_CMDS
 
         fi
+        sleep 10
         log_ok "DONE"
 
 else
