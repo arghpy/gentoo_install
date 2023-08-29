@@ -184,7 +184,7 @@ mounting() {
 
 # Configuring date
 date_config() {
-    log_info "Configuring data with chrony"
+    log_info "Configuring time with chrony"
     chronyd -q
     log_ok "DONE"
 }
