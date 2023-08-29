@@ -44,11 +44,11 @@ configure_portage() {
     log_ok "DONE"
 
     log_info "Updating the @world set"
-    emerge --ask --verbose --update --deep --newuse @world
+    emerge -q --verbose --update --deep --newuse @world
     log_ok "DONE"
 
     log_info "Configuring CPU_FLAGS"
-    emerge --ask app-portage/cpuid2cpuflags
+    emerge -q app-portage/cpuid2cpuflags
     echo "*/* $(cpuid2cpuflags)" > /etc/portage/package.use/00cpu-flags
     log_ok "DONE"
 
@@ -116,7 +116,7 @@ configure_and_install_kernel() {
 
 
     log_info "Installing linux-firmware"
-    emerge --ask sys-kernel/linux-firmware
+    emerge -q sys-kernel/linux-firmware
     if lscpu | grep "^Model name" | grep -i intel; then
         emerge sys-firmware/intel-microcode
         emerge x11-drivers/xf86-video-intel
@@ -124,8 +124,8 @@ configure_and_install_kernel() {
     log_ok "DONE"
 
     log_info "Installing the kernel"
-    emerge --ask sys-kernel/installkernel-gentoo
-    emerge --ask sys-kernel/gentoo-kernel
+    emerge -q sys-kernel/installkernel-gentoo
+    emerge -q sys-kernel/gentoo-kernel
     log_ok "DONE"
 
     log_info "Cleaning up"
@@ -153,7 +153,7 @@ generate_hostname() {
 # Enable networking
 enable_network() {
     log_info "Enable networking"
-    emerge --ask net-misc/dhcpcd
+    emerge -q net-misc/dhcpcd
     rc-update add dhcpcd default
     rc-service dhcpcd start
     log_ok "DONE"
@@ -172,17 +172,17 @@ change_root_password() {
 install_tools() {
     log_info "Installing tools"
     log_info "system logger"
-    emerge --ask app-admin/sysklogd
+    emerge -q app-admin/sysklogd
     rc-update add sysklogd default
     log_ok "DONE"
 
     log_info "Cron daemon"
-    emerge --ask sys-process/cronie
+    emerge -q sys-process/cronie
     rc-update add cronie default
     log_ok "DONE"
 
     log_info "File indexing"
-    emerge --ask sys-apps/mlocate
+    emerge -q sys-apps/mlocate
     log_ok "DONE"
 
     log_info "enabling sshd"
@@ -190,20 +190,20 @@ install_tools() {
     log_ok "DONE"
 
     log_info "bash completion"
-    emerge --ask app-shells/bash-completion
+    emerge -q app-shells/bash-completion
     log_ok "DONE"
 
     log_info "Time Synchronization"
-    emerge --ask net-misc/chrony
+    emerge -q net-misc/chrony
     rc-update add chronyd default
     log_ok "DONE"
 
     log_info "udev scheduler"
-    emerge --ask sys-block/io-scheduler-udev-rules
+    emerge -q sys-block/io-scheduler-udev-rules
     log_ok "DONE"
 
     log_info "Wireless tools"
-    emerge --ask net-wireless/iw net-wireless/wpa_supplicant
+    emerge -q net-wireless/iw net-wireless/wpa_supplicant
     log_ok "DONE"
     log_ok "DONE"
 }
@@ -222,11 +222,11 @@ grub() {
     log_info "Installing and configuring grub"
 	if [[ "${MODE}" == "UEFI" ]]; then
         echo 'GRUB_PLATFORMS="efi-64"' >> /etc/portage/make.conf
-        emerge --ask sys-boot/grub
+        emerge -q sys-boot/grub
         grub-install --target=x86_64-efi --efi-directory=/boot
 		grub-mkconfig -o /boot/grub/grub.cfg
 	elif [[ "${MODE}" == "BIOS" ]]; then
-        emerge --ask --verbose sys-boot/grub
+        emerge -q --verbose sys-boot/grub
 		grub-install /dev/"${DISK}"
 		grub-mkconfig -o /boot/grub/grub.cfg
 	else
