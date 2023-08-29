@@ -274,6 +274,7 @@ mounting_filesystems() {
 # Enter the new environment
 enter_environment() {
     log_info "Copying the second installation part to the new environment"
+    chmod +x installation_part2.sh
     cp installation_part2.sh /mnt/gentoo/
     log_ok "DONE"
 
