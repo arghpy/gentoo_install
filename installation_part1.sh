@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 LOG_FUNC="https://raw.githubusercontent.com/arghpy/functions/main/log_functions.sh"
-SECOND_SCRIPT="https://raw.githubusercontent.com/arghpy/gentoo_installation/main/installation_part2.sh"
+SECOND_SCRIPT="https://raw.githubusercontent.com/arghpy/gentoo_install/main/installation_part2.sh"
 
 # Sourcing log functions
 wget "${LOG_FUNC}"
