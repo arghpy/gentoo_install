@@ -279,7 +279,7 @@ enter_environment() {
     log_ok "DONE"
 
     log_info "Entering the new environment"
-    log_info "Run the second part of the script: 'installation_part2.sh ${MODE} ${DISK}'"
+    log_info "Run the second part of the script: './installation_part2.sh ${MODE} ${DISK}'"
     chroot /mnt/gentoo /bin/bash
 }
 
