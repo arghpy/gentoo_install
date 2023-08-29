@@ -44,7 +44,7 @@ configure_portage() {
     log_ok "DONE"
 
     log_info "Updating the @world set"
-    emerge -q --verbose --update --deep --newuse @world
+    emerge --verbose --update --deep --newuse @world
     log_ok "DONE"
 
     log_info "Configuring CPU_FLAGS"
