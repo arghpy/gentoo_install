@@ -60,7 +60,7 @@ configure_portage() {
         VIDEO_CARDS="VIDEO_CARDS=\"intel\""
     elif echo "${GPU}" | grep -i nvidia; then 
         VIDEO_CARDS="VIDEO_CARDS=\"nouveau\""
-        emerge x11-drivers/nvidia-drivers
+        emerge -q x11-drivers/nvidia-drivers
     elif echo "${GPU}" | grep -i amd; then 
         VIDEO_CARDS="VIDEO_CARDS=\"radeon\""
     fi
@@ -118,8 +118,8 @@ configure_and_install_kernel() {
     log_info "Installing linux-firmware"
     emerge -q sys-kernel/linux-firmware
     if lscpu | grep "^Model name" | grep -i intel; then
-        emerge sys-firmware/intel-microcode
-        emerge x11-drivers/xf86-video-intel
+        emerge -q sys-firmware/intel-microcode
+        emerge -q x11-drivers/xf86-video-intel
     fi
     log_ok "DONE"
 
@@ -138,7 +138,7 @@ configure_and_install_kernel() {
 # Generating the fstab
 generate_fstab() {
     log_info "Generating the fstab"
-    emerge sys-fs/genfstab
+    emerge -q sys-fs/genfstab
     genfstab -U / >> /etc/fstab
     log_ok "DONE"
 }
