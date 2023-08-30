@@ -52,76 +52,89 @@ if [[ -n $(echo $OPTIONS | grep $OPT 2>/dev/null) ]]; then
 
                 MODE="UEFI"
 
-        sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << FDISK_CMDS | fdisk /dev/$DISK
-g      # create new GPT partition
-n      # add new partition
-       # partition number
-       # default - first sector
-+1G    # partition size
-y      # to remove signature if it is the case
-t      # to change the type of the partition
-1      # if there is a need to press enter
-       # if there is a need to press enter
-       # if there is a need to press enter
-n      # add new partition
-       # partition type
-       # partition number
-+4G    # partition size
-y      # to remove signature if it is the case
-t      # to change the type of the partition
-2      # select the second partition
-19     # swap partition type
-       # if there is a need to press enter
-       # if there is a need to press enter
-n      # add new partition
-       # partition number
-       # default - first sector
-+30G   # default - last sector
-y      # to remove signature if it is the case
-n      # change partition type
-       # partition number
-       # default - first sector
-       # default - last sector
-y      # to remove signature if it is the case
-w      # write partition table and exit
-FDISK_CMDS
+                parted --script /dev/"${DISK}" mklabel gpt
+                parted --script /dev/"${DISK}" mkpart primary 1 1GiB
+                parted --script /dev/"${DISK}" mkpart primary 1GiB 5GiB
+                parted --script /dev/"${DISK}" mkpart primary 5GiB 35GiB
+                parted --script /dev/"${DISK}" mkpart primary 35GiB 100%
+
+#        sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << FDISK_CMDS | fdisk /dev/$DISK
+#g      # create new GPT partition
+#n      # add new partition
+#       # partition number
+#       # default - first sector
+#+1G    # partition size
+#y      # to remove signature if it is the case
+#t      # to change the type of the partition
+#1      # if there is a need to press enter
+#       # if there is a need to press enter
+#       # if there is a need to press enter
+#n      # add new partition
+#       # partition type
+#       # partition number
+#+4G    # partition size
+#y      # to remove signature if it is the case
+#t      # to change the type of the partition
+#2      # select the second partition
+#19     # swap partition type
+#       # if there is a need to press enter
+#       # if there is a need to press enter
+#n      # add new partition
+#       # partition number
+#       # default - first sector
+#+30G   # default - last sector
+#y      # to remove signature if it is the case
+#n      # change partition type
+#       # partition number
+#       # default - first sector
+#       # default - last sector
+#y      # to remove signature if it is the case
+#w      # write partition table and exit
+#FDISK_CMDS
 
         else
 
 
                 MODE="BIOS"
 
-        sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << FDISK_CMDS | fdisk /dev/$DISK
-o      # create new MBR partition
-n      # add new partition
-       # partition number
-       # default - first sector
-+1G    # partition size
-y      # to remove signature if it is the case
-n      # add new partition
-       # partition type
-       # partition number
-+4G    # partition size
-y      # to remove signature if it is the case
-t      # to change the type of the partition
-2      # select the second partition
-19     # swap partition type
-       # if there is a need to press enter
-       # if there is a need to press enter
-n      # add new partition
-       # partition number
-       # default - first sector
-+30G   # default - last sector
-y      # to remove signature if it is the case
-n      # change partition type
-       # partition number
-       # default - first sector
-       # default - last sector
-y      # to remove signature if it is the case
-w      # write partition table and exit
-FDISK_CMDS
+                parted --script /dev/"${DISK}" mklabel gpt
+                parted --script /dev/"${DISK}" mkpart primary 1 1GiB
+                parted --script /dev/"${DISK}" mkpart primary 1GiB 5GiB
+                parted --script /dev/"${DISK}" mkpart primary 5GiB 35GiB
+                parted --script /dev/"${DISK}" mkpart primary 35GiB 100%
+
+#        sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << FDISK_CMDS | fdisk /dev/$DISK
+#o      # create new MBR partition
+#n      # add new partition
+#       # partition number
+#       # default - first sector
+#+1G    # partition size
+#y      # to remove signature if it is the case
+#n      # add new partition
+#       # partition type
+#       # partition number
+#+4G    # partition size
+#y      # to remove signature if it is the case
+#t      # to change the type of the partition
+#2      # select the second partition
+#19     # swap partition type
+#       # if there is a need to press enter
+#       # if there is a need to press enter
+#n      # add new partition
+#       # partition number
+#       # default - first sector
+#+30G   # default - last sector
+#y      # to remove signature if it is the case
+#n      # change partition type
+#       # partition number
+#       # default - first sector
+#       # default - last sector
+#y      # to remove signature if it is the case
+#w      # write partition table and exit
+#FDISK_CMDS
 
         fi
+        lsblk
         sleep 10
         log_ok "DONE"
 
