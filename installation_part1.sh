@@ -64,6 +64,7 @@ partitioning() {
         fi
 
         parted --script /dev/"${DISK}" mkpart primary 1GiB 5GiB
+        parted --script /dev/"${DISK}" set 2 swap on
         parted --script /dev/"${DISK}" mkpart primary 5GiB 35GiB
         parted --script /dev/"${DISK}" mkpart primary 35GiB 100%
         parted --script /dev/"${DISK}" align-check optimal 1 
