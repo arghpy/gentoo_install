@@ -54,9 +54,11 @@ if [[ -n $(echo $OPTIONS | grep $OPT 2>/dev/null) ]]; then
 
                 parted --script /dev/"${DISK}" mklabel gpt
                 parted --script /dev/"${DISK}" mkpart primary 1 1GiB
+                parted --script /dev/"${DISK}" set 1 boot on
                 parted --script /dev/"${DISK}" mkpart primary 1GiB 5GiB
                 parted --script /dev/"${DISK}" mkpart primary 5GiB 35GiB
                 parted --script /dev/"${DISK}" mkpart primary 35GiB 100%
+                parted --script /dev/"${DISK}" align-check optimal 1 
 
 #        sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << FDISK_CMDS | fdisk /dev/$DISK
 #g      # create new GPT partition
@@ -97,11 +99,12 @@ if [[ -n $(echo $OPTIONS | grep $OPT 2>/dev/null) ]]; then
 
                 MODE="BIOS"
 
-                parted --script /dev/"${DISK}" mklabel gpt
+                parted --script /dev/"${DISK}" mklabel msdod
                 parted --script /dev/"${DISK}" mkpart primary 1 1GiB
                 parted --script /dev/"${DISK}" mkpart primary 1GiB 5GiB
                 parted --script /dev/"${DISK}" mkpart primary 5GiB 35GiB
                 parted --script /dev/"${DISK}" mkpart primary 35GiB 100%
+                parted --script /dev/"${DISK}" align-check optimal 1 
 
 #        sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << FDISK_CMDS | fdisk /dev/$DISK
 #o      # create new MBR partition
