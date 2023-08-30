@@ -44,107 +44,35 @@ disks() {
 # Creating partitions
 partitioning() {
     log_info "Partitioning disk"
-if [[ -n $(echo $OPTIONS | grep $OPT 2>/dev/null) ]]; then
+    if [[ -n $(echo $OPTIONS | grep $OPT 2>/dev/null) ]]; then
 
         DISK=$(lsblk -d -n | grep -v "loop" | awk '{print $1}' | awk ' NR == '$OPT' {print }')
 
         if [[ -n $(ls /sys/firmware/efi/efivars 2>/dev/null) ]];then
 
-                MODE="UEFI"
+            MODE="UEFI"
 
-                parted --script /dev/"${DISK}" mklabel gpt
-                parted --script /dev/"${DISK}" mkpart primary 1 1GiB
-                parted --script /dev/"${DISK}" set 1 boot on
-                parted --script /dev/"${DISK}" mkpart primary 1GiB 5GiB
-                parted --script /dev/"${DISK}" mkpart primary 5GiB 35GiB
-                parted --script /dev/"${DISK}" mkpart primary 35GiB 100%
-                parted --script /dev/"${DISK}" align-check optimal 1 
-
-#        sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << FDISK_CMDS | fdisk /dev/$DISK
-#g      # create new GPT partition
-#n      # add new partition
-#       # partition number
-#       # default - first sector
-#+1G    # partition size
-#y      # to remove signature if it is the case
-#t      # to change the type of the partition
-#1      # if there is a need to press enter
-#       # if there is a need to press enter
-#       # if there is a need to press enter
-#n      # add new partition
-#       # partition type
-#       # partition number
-#+4G    # partition size
-#y      # to remove signature if it is the case
-#t      # to change the type of the partition
-#2      # select the second partition
-#19     # swap partition type
-#       # if there is a need to press enter
-#       # if there is a need to press enter
-#n      # add new partition
-#       # partition number
-#       # default - first sector
-#+30G   # default - last sector
-#y      # to remove signature if it is the case
-#n      # change partition type
-#       # partition number
-#       # default - first sector
-#       # default - last sector
-#y      # to remove signature if it is the case
-#w      # write partition table and exit
-#FDISK_CMDS
-
+            parted --script /dev/"${DISK}" mklabel gpt
+            parted --script /dev/"${DISK}" mkpart primary 1 1GiB
+            parted --script /dev/"${DISK}" set 1 boot on
         else
 
+            MODE="BIOS"
 
-                MODE="BIOS"
-
-                parted --script /dev/"${DISK}" mklabel msdos
-                parted --script /dev/"${DISK}" mkpart primary 1 1GiB
-                parted --script /dev/"${DISK}" mkpart primary 1GiB 5GiB
-                parted --script /dev/"${DISK}" mkpart primary 5GiB 35GiB
-                parted --script /dev/"${DISK}" mkpart primary 35GiB 100%
-                parted --script /dev/"${DISK}" align-check optimal 1 
-
-#        sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << FDISK_CMDS | fdisk /dev/$DISK
-#o      # create new MBR partition
-#n      # add new partition
-#       # partition number
-#       # default - first sector
-#+1G    # partition size
-#y      # to remove signature if it is the case
-#n      # add new partition
-#       # partition type
-#       # partition number
-#+4G    # partition size
-#y      # to remove signature if it is the case
-#t      # to change the type of the partition
-#2      # select the second partition
-#19     # swap partition type
-#       # if there is a need to press enter
-#       # if there is a need to press enter
-#n      # add new partition
-#       # partition number
-#       # default - first sector
-#+30G   # default - last sector
-#y      # to remove signature if it is the case
-#n      # change partition type
-#       # partition number
-#       # default - first sector
-#       # default - last sector
-#y      # to remove signature if it is the case
-#w      # write partition table and exit
-#FDISK_CMDS
-
+            parted --script /dev/"${DISK}" mklabel msdos
+            parted --script /dev/"${DISK}" mkpart primary 1 1GiB
         fi
-        lsblk
-        sleep 10
+
+        parted --script /dev/"${DISK}" mkpart primary 1GiB 5GiB
+        parted --script /dev/"${DISK}" mkpart primary 5GiB 35GiB
+        parted --script /dev/"${DISK}" mkpart primary 35GiB 100%
+        parted --script /dev/"${DISK}" align-check optimal 1 
         log_ok "DONE"
 
-else
+    else
         log_error "Wrong option. Aborting..."
         exit -1
-fi
+    fi
 
 }
 
@@ -193,7 +121,7 @@ date_config() {
 # Downloading and unarchiving stage3 tarball
 download_and_configure_stage3() {
     log_info "Downloading and setting stage3 tarball"
-    STAGE="https://distfiles.gentoo.org/releases/amd64/autobuilds/20230827T170145Z/stage3-amd64-desktop-openrc-20230827T170145Z.tar.xz"
+    STAGE="https://distfiles.gentoo.org/releases/amd64/autobuilds/20230827T170145Z/stage3-amd64-openrc-20230827T170145Z.tar.xz"
 
     pushd /mnt/gentoo
 
@@ -278,8 +206,10 @@ enter_environment() {
     cp installation_part2.sh /mnt/gentoo/
     log_ok "DONE"
 
+    log_info "Removing installation_part1.sh and log_functions.sh"
     log_info "Entering the new environment"
     log_info "Run the second part of the script: './installation_part2.sh ${MODE} ${DISK}'"
+    rm -f installation_part1.sh log_functions.sh
     chroot /mnt/gentoo /bin/bash
 }
 

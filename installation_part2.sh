@@ -27,7 +27,7 @@ prep_env() {
 mount_boot() {
     log_info "Mounting boot partition"
 
-    PARTITIONS=$(lsblk --list --noheadings /dev/"$DISK" | tail -n +2 | awk '{print $1}')
+    PARTITIONS=$(lsblk --list --noheadings /dev/"${DISK}" | tail -n +2 | awk '{print $1}')
     BOOT_P=$(echo "$PARTITIONS" | sed -n '1p')
 
     mount "${BOOT_P}" /boot
@@ -55,13 +55,14 @@ configure_portage() {
     log_info "Configuring VIDEO_CARDS"
 
     GPU="$(lspci | grep VGA)"
+    VIDEO_CARDS=""
 
-    if echo "${GPU}" | grep -i intel; then
+    if [ -n "$(echo "${GPU}" | grep -i intel)" ]; then
         VIDEO_CARDS="VIDEO_CARDS=\"intel\""
-    elif echo "${GPU}" | grep -i nvidia; then 
+    elif [ -n "$(echo "${GPU}" | grep -i nvidia)" ]; then 
         VIDEO_CARDS="VIDEO_CARDS=\"nouveau\""
         emerge -q x11-drivers/nvidia-drivers
-    elif echo "${GPU}" | grep -i amd; then 
+    elif [ -n "$(echo "${GPU}" | grep -i amd)" ]; then 
         VIDEO_CARDS="VIDEO_CARDS=\"radeon\""
     fi
 
@@ -137,6 +138,7 @@ configure_and_install_kernel() {
 
 # Generating the fstab
 generate_fstab() {
+    mount_boot
     log_info "Generating the fstab"
     emerge -q sys-fs/genfstab
     genfstab -U / >> /etc/fstab
@@ -250,6 +252,8 @@ set_user() {
 
     log_info "Adding user to users, audio, video and wheel group"
 	useradd -m -g wheel,users,audio,video -s /bin/zsh "${NAME}"
+    log_info "Adding wheel to sudoers"
+    echo "%wheel ALL=(ALL:ALL) ALL" >> /etc/sudoers
 
 	export REPODIR="/home/${NAME}/.local/src"
 	mkdir --parents "${REPODIR}"
@@ -265,9 +269,55 @@ set_user() {
     log_ok "DONE"
 }
 
+# Move configuration files in user home
+move_dotfiles() {
+    log_info "Configuring the user's home directory"
+    CONFIG_GIT="https://github.com/arghpy/dotfiles"
+    rm -rf /home/"${NAME}"/* 
+    rm -rf /home/"${NAME}"/.* 
+    git -C /home/"${NAME}"/ clone "${CONFIG_GIT}"
+    mv /home/"${NAME}"/dotfiles/* /home/"${NAME}"/.
+    mv /home/"${NAME}"/dotfiles/.* /home/"${NAME}"/.
+    rm -rf /home/"${NAME}"/dotfiles
+    rm -rf /home/"${NAME}"/.git
+    log_ok "DONE"
+}
+
+# Copy custom dwm suite and neovim config
+other_progs() {
+    mkdir --parents /home/"${NAME}"/.local/src/
+    mkdir --parents /home/"${NAME}"/.config
+    log_info "Cloning dwm in .local/src"
+    git -C /home/"${NAME}"/.local/src/ clone "https://github.com/arghpy/dwm"
+    log_ok "DONE"
+
+    log_info "Cloning dwmblocks in .local/src"
+    git -C /home/"${NAME}"/.local/src/ clone "https://github.com/arghpy/dwmblocks"
+    log_ok "DONE"
+
+    log_info "Cloning nvim in .config"
+    git -C /home/"${NAME}"/.config/ clone "https://github.com/arghpy/nvim_config"
+    mv /home/"${NAME}"/.config/nvim_config/* /home/"${NAME}"/.config/
+    rm -rf /home/"${NAME}"/.config/nvim_config
+    log_ok "DONE"
+
+    log_info "Modifying config settings for the local user"
+    for i in $(grep -r "arghpy" /home/"${NAME}"/* 2>/dev/null | awk -F ':' '{print $1}'); do
+        sed -i "s|arghpy|${NAME}|g" "${i}"
+    done
+    log_ok "DONE"
+
+    log_info "Compiling sources in .local/src/"
+    for i in $(ls -ld /home/"${NAME}"/.local/src/* | awk '{print $NF}' | grep -v "yay\|lf\|icons");do
+        cd "${i}"
+        make clean install
+    done
+
+    chown -R  "${NAME}":wheel /home/"${NAME}"/*
+    log_ok "DONE"
+}
 
 prep_env
-mount_boot
 configure_portage
 setting_timezone
 configure_locales
@@ -280,46 +330,10 @@ install_tools
 install_packages
 grub
 set_user
+#move_dotfiles
+other_progs
 
-log_info "Adding wheel to sudoers"
-echo "%wheel ALL=(ALL:ALL) ALL" >> /etc/sudoers
-
-log_info "Configuring the user's home directory"
-rm -rf /home/"${NAME}"/* 
-rm -rf /home/"${NAME}"/.* 
-sudo -u "${NAME}" git -C /home/"${NAME}"/ clone "${CONFIG_GIT}"
-mv /home/"${NAME}"/dotfiles/* /home/"${NAME}"/.
-mv /home/"${NAME}"/dotfiles/.* /home/"${NAME}"/.
-rm -rf /home/"${NAME}"/dotfiles
-rm -rf /home/"${NAME}"/.git
-log_ok "DONE"
-
-log_info "Cloning dwm in .local/src"
-sudo -u "${NAME}" git -C /home/"${NAME}"/.local/src/ clone "https://github.com/arghpy/dwm"
-log_ok "DONE"
-
-log_info "Cloning dwmblocks in .local/src"
-sudo -u "${NAME}" git -C /home/"${NAME}"/.local/src/ clone "https://github.com/arghpy/dwmblocks"
-log_ok "DONE"
-
-log_info "Cloning nvim in .config"
-sudo -u "${NAME}" git -C /home/"${NAME}"/.config/ clone "https://github.com/arghpy/nvim_config"
-sudo -u "${NAME}" mv /home/"${NAME}"/.config/nvim_config/* /home/"${NAME}"/.config/
-sudo -u "${NAME}" rm -rf /home/"${NAME}"/.config/nvim_config
-log_ok "DONE"
-
-log_info "Modifying config settings for the local user"
-for i in $(grep -r "arghpy" /home/"${NAME}"/* 2>/dev/null | awk -F ':' '{print $1}'); do  sed -i "s|arghpy|${NAME}|g" $i; done
-log_ok "DONE"
-
-log_info "Compiling sources in .local/src/"
-for i in $(ls -ld /home/"${NAME}"/.local/src/* | awk '{print $NF}' | grep -v "yay\|lf\|icons");do
-    cd "${i}"
-    make clean install
-done
-log_ok "DONE"
 
 log_ok "DONE"
 log_info "Exit the chroot now 'exit' and reboot"
 log_warning "Don't forget to take out the installation media"
-
