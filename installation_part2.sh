@@ -241,17 +241,19 @@ grub() {
 
 # Set user and password
 set_user() {
+
     log_info "Setting user account"
 
     NAME=""
 
-    while [-z "${NAME}" ]; do
+    while [ -z "${NAME}" ]; do
         printf "Enter name for the local user: "
         read NAME
     done
 
     log_info "Adding user to users, audio, video and wheel group"
-	useradd -m -g wheel,users,audio,video -s /bin/zsh "${NAME}"
+	useradd -m -G wheel,users,audio,video -s /bin/zsh "${NAME}"
+
     log_info "Adding wheel to sudoers"
     echo "%wheel ALL=(ALL:ALL) ALL" >> /etc/sudoers
 
