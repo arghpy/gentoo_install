@@ -30,7 +30,7 @@ mount_boot() {
     PARTITIONS=$(lsblk --list --noheadings /dev/"${DISK}" | tail -n +2 | awk '{print $1}')
     BOOT_P=$(echo "$PARTITIONS" | sed -n '1p')
 
-    mount "${BOOT_P}" /boot
+    mount /dev/"${BOOT_P}" /boot
 
     log_ok "DONE"
 }
@@ -256,10 +256,6 @@ set_user() {
 
     log_info "Adding wheel to sudoers"
     echo "%wheel ALL=(ALL:ALL) ALL" >> /etc/sudoers
-
-	export REPODIR="/home/${NAME}/.local/src"
-	mkdir --parents "${REPODIR}"
-	chown -R "${NAME}":wheel "$(dirname "${REPODIR}")"
 
     log_info "Setting up user password"
 	printf "\n\nEnter password for %s\n\n" "$NAME"
