@@ -99,7 +99,7 @@ if [[ -n $(echo $OPTIONS | grep $OPT 2>/dev/null) ]]; then
 
                 MODE="BIOS"
 
-                parted --script /dev/"${DISK}" mklabel msdod
+                parted --script /dev/"${DISK}" mklabel msdos
                 parted --script /dev/"${DISK}" mkpart primary 1 1GiB
                 parted --script /dev/"${DISK}" mkpart primary 1GiB 5GiB
                 parted --script /dev/"${DISK}" mkpart primary 5GiB 35GiB
