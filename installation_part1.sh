@@ -53,21 +53,29 @@ partitioning() {
             MODE="UEFI"
 
             parted --script /dev/"${DISK}" mklabel gpt
-            parted --script /dev/"${DISK}" mkpart primary 2048s 1GiB
-            parted --script /dev/"${DISK}" set 1 boot on
+
+            parted --script /dev/"${DISK}" mkpart "EFI system partition" fat32 1MiB 1GiB
+            parted --script /dev/"${DISK}" set 1 esp on
+
+            parted --script /dev/"${DISK}" mkpart "swap partition" linux-swap 1GiB 5GiB
+            parted --script /dev/"${DISK}" mkpart "root partition" ext4 5GiB 35GiB
+            parted --script /dev/"${DISK}" mkpart "home partition" ext4 35GiB 100%
+            parted --script /dev/"${DISK}" align-check optimal 1 
         else
 
             MODE="BIOS"
 
             parted --script /dev/"${DISK}" mklabel msdos
-            parted --script /dev/"${DISK}" mkpart primary 2048s 1GiB
+
+            parted --script /dev/"${DISK}" mkpart primary ext4 1Mib 1GiB
+            parted --script /dev/"${DISK}" set 1 boot on
+
+            parted --script /dev/"${DISK}" mkpart primary linux-swap 1GiB 5GiB
+            parted --script /dev/"${DISK}" mkpart primary ext4 5GiB 35GiB
+            parted --script /dev/"${DISK}" mkpart primary ext4 35GiB 100%
+            parted --script /dev/"${DISK}" align-check optimal 1 
         fi
 
-        parted --script /dev/"${DISK}" mkpart primary 1GiB 5GiB
-        parted --script /dev/"${DISK}" set 2 swap on
-        parted --script /dev/"${DISK}" mkpart primary 5GiB 35GiB
-        parted --script /dev/"${DISK}" mkpart primary 35GiB 100%
-        parted --script /dev/"${DISK}" align-check optimal 1 
         log_ok "DONE"
 
     else
