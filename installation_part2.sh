@@ -252,7 +252,7 @@ set_user() {
     done
 
     log_info "Adding user to users, audio, video and wheel group"
-	useradd -m -G wheel,users,audio,video -s /bin/zsh "${NAME}"
+	useradd -m -G wheel,users,audio,video -s /bin/bash "${NAME}"
 
     log_info "Adding wheel to sudoers"
     echo "%wheel ALL=(ALL:ALL) ALL" >> /etc/sudoers
