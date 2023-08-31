@@ -67,12 +67,9 @@ partitioning() {
 
             parted --script /dev/"${DISK}" mklabel msdos
 
-            parted --script /dev/"${DISK}" mkpart primary ext4 2048s 1GiB
-            parted --script /dev/"${DISK}" set 1 boot on
-
-            parted --script /dev/"${DISK}" mkpart primary linux-swap 1GiB 5GiB
-            parted --script /dev/"${DISK}" mkpart primary ext4 5GiB 35GiB
-            parted --script /dev/"${DISK}" mkpart primary ext4 35GiB 100%
+            parted --script /dev/"${DISK}" mkpart primary linux-swap 2048s 4GiB
+            parted --script /dev/"${DISK}" mkpart primary ext4 4GiB 34GiB
+            parted --script /dev/"${DISK}" mkpart primary ext4 34GiB 100%
             parted --script /dev/"${DISK}" align-check optimal 1 
         fi
 
