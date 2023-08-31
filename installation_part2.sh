@@ -55,21 +55,17 @@ configure_portage() {
     log_info "Configuring VIDEO_CARDS"
 
     GPU="$(lspci | grep VGA)"
-    VIDEO_CARDS=""
 
     if [ -n "$(echo "${GPU}" | grep -i intel)" ]; then
-        VIDEO_CARDS="VIDEO_CARDS=\"intel\""
+        echo 'VIDEO_CARDS="intel"' >> /etc/portage/make.conf
     elif [ -n "$(echo "${GPU}" | grep -i nvidia)" ]; then 
-        VIDEO_CARDS="VIDEO_CARDS=\"nouveau\""
+        echo 'VIDEO_CARDS="nouveau"' >> /etc/portage/make.conf
         emerge -q x11-drivers/nvidia-drivers
     elif [ -n "$(echo "${GPU}" | grep -i amd)" ]; then 
-        VIDEO_CARDS="VIDEO_CARDS=\"radeon\""
+        echo 'VIDEO_CARDS="radeon"' >> /etc/portage/make.conf
     fi
 
-    echo "${VIDEO_CARDS}" >> /etc/portage/make.conf
-
     log_ok "DONE"
-
     log_ok "DONE"
 }
 
