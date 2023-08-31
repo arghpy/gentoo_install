@@ -53,14 +53,14 @@ partitioning() {
             MODE="UEFI"
 
             parted --script /dev/"${DISK}" mklabel gpt
-            parted --script /dev/"${DISK}" mkpart primary 1 1GiB
+            parted --script /dev/"${DISK}" mkpart primary 2048s 1GiB
             parted --script /dev/"${DISK}" set 1 boot on
         else
 
             MODE="BIOS"
 
             parted --script /dev/"${DISK}" mklabel msdos
-            parted --script /dev/"${DISK}" mkpart primary 1 1GiB
+            parted --script /dev/"${DISK}" mkpart primary 2048s 1GiB
         fi
 
         parted --script /dev/"${DISK}" mkpart primary 1GiB 5GiB
