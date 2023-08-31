@@ -30,7 +30,7 @@ mount_boot() {
     PARTITIONS=$(lsblk --list --noheadings /dev/"${DISK}" | tail -n +2 | awk '{print $1}')
     BOOT_P=$(echo "$PARTITIONS" | sed -n '1p')
 
-    mount /dev/"${BOOT_P}" /boot
+    [[ "${MODE}" == "UEFI" ]] && mount /dev/"${BOOT_P}" /boot
 
     log_ok "DONE"
 }

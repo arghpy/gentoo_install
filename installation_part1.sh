@@ -66,10 +66,9 @@ partitioning() {
             MODE="BIOS"
 
             parted --script /dev/"${DISK}" mklabel msdos
-
-            parted --script /dev/"${DISK}" mkpart primary linux-swap 2048s 4GiB
-            parted --script /dev/"${DISK}" mkpart primary ext4 4GiB 34GiB
-            parted --script /dev/"${DISK}" mkpart primary ext4 34GiB 100%
+            parted --script /dev/"${DISK}" mkpart primary ext4 2048s 35GiB
+            parted --script /dev/"${DISK}" mkpart primary linux-swap 35GiB 39GiB
+            parted --script /dev/"${DISK}" mkpart primary ext4 39GiB 100%
             parted --script /dev/"${DISK}" align-check optimal 1 
         fi
 
@@ -89,12 +88,21 @@ formatting() {
     log_info "Formatting partitions"
     PARTITIONS=$(lsblk --list --noheadings /dev/"$DISK" | tail -n +2 | awk '{print $1}')
 
-    BOOT_P=$(echo "$PARTITIONS" | sed -n '1p')
-    SWAP_P=$(echo "$PARTITIONS" | sed -n '2p')
-    ROOT_P=$(echo "$PARTITIONS" | sed -n '3p')
-    HOME_P=$(echo "$PARTITIONS" | sed -n '4p')
+    if [[ "${MODE}" == "UEFI" ]]; then
 
-    mkfs.vfat -F32 /dev/"${BOOT_P}"
+        BOOT_P=$(echo "$PARTITIONS" | sed -n '1p')
+        mkfs.vfat -F32 /dev/"${BOOT_P}"
+
+        SWAP_P=$(echo "$PARTITIONS" | sed -n '2p')
+        ROOT_P=$(echo "$PARTITIONS" | sed -n '3p')
+        HOME_P=$(echo "$PARTITIONS" | sed -n '4p')
+    elif [[ "${MODE}" == "BIOS" ]]; then 
+        ROOT_P=$(echo "$PARTITIONS" | sed -n '1p')
+        SWAP_P=$(echo "$PARTITIONS" | sed -n '2p')
+        HOME_P=$(echo "$PARTITIONS" | sed -n '3p')
+
+    fi
+
     mkswap /dev/"${SWAP_P}"
     swapon /dev/"${SWAP_P}"
     mkfs.ext4 -F /dev/"${HOME_P}"
