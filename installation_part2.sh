@@ -327,11 +327,11 @@ main() {
     enable_network
     change_root_password
     install_tools
-    install_packages
+    #install_packages
     grub
     set_user
     #move_dotfiles
-    other_progs
+    #other_progs
 
 
     log_ok "DONE"
