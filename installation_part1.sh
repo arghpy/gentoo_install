@@ -54,7 +54,7 @@ partitioning() {
 
             parted --script /dev/"${DISK}" mklabel gpt
 
-            parted --script /dev/"${DISK}" mkpart "EFI system partition" fat32 0 1GiB
+            parted --script /dev/"${DISK}" mkpart "EFI system partition" fat32 2048s 1GiB
             parted --script /dev/"${DISK}" set 1 esp on
 
             parted --script /dev/"${DISK}" mkpart "swap partition" linux-swap 1GiB 5GiB
@@ -67,7 +67,7 @@ partitioning() {
 
             parted --script /dev/"${DISK}" mklabel msdos
 
-            parted --script /dev/"${DISK}" mkpart primary ext4 0 1GiB
+            parted --script /dev/"${DISK}" mkpart primary ext4 2048s 1GiB
             parted --script /dev/"${DISK}" set 1 boot on
 
             parted --script /dev/"${DISK}" mkpart primary linux-swap 1GiB 5GiB
