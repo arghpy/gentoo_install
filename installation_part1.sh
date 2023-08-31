@@ -215,17 +215,21 @@ enter_environment() {
 }
 
 
-# Running the functions
-check_internet
-disks
-partitioning
-formatting
-mounting
-date_config
-download_and_configure_stage3
-make_conf_portage
-select_mirrors
-config_ebuild_repo
-dns_copy
-mounting_filesystems
-enter_environment
+# Main function to run all program
+main() {
+    check_internet
+    disks
+    partitioning
+    formatting
+    mounting
+    date_config
+    download_and_configure_stage3
+    make_conf_portage
+    select_mirrors
+    config_ebuild_repo
+    dns_copy
+    mounting_filesystems
+    enter_environment
+}
+
+main

@@ -315,23 +315,28 @@ other_progs() {
     log_ok "DONE"
 }
 
-prep_env
-configure_portage
-setting_timezone
-configure_locales
-configure_and_install_kernel
-generate_fstab
-generate_hostname
-enable_network
-change_root_password
-install_tools
-install_packages
-grub
-set_user
-#move_dotfiles
-other_progs
+# Main function to run all program
+main() {
+    prep_env
+    configure_portage
+    setting_timezone
+    configure_locales
+    configure_and_install_kernel
+    generate_fstab
+    generate_hostname
+    enable_network
+    change_root_password
+    install_tools
+    install_packages
+    grub
+    set_user
+    #move_dotfiles
+    other_progs
 
 
-log_ok "DONE"
-log_info "Exit the chroot now 'exit' and reboot"
-log_warning "Don't forget to take out the installation media"
+    log_ok "DONE"
+    log_info "Exit the chroot now 'exit' and reboot"
+    log_warning "Don't forget to take out the installation media"
+}
+
+main
