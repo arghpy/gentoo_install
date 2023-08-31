@@ -226,6 +226,9 @@ grub() {
 	if [[ "${MODE}" == "UEFI" ]]; then
         echo 'GRUB_PLATFORMS="efi-64"' >> /etc/portage/make.conf
         emerge -q sys-boot/grub
+        pushd /usr/src/linux
+        make install
+        popd
         grub-install --target=x86_64-efi --efi-directory=/boot
 		grub-mkconfig -o /boot/grub/grub.cfg
 	elif [[ "${MODE}" == "BIOS" ]]; then
