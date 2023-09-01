@@ -325,6 +325,16 @@ my_custom_progs() {
     log_ok "DONE"
 }
 
+set_fonts() {
+    log_info "Setting JetBrains Mono Nerd Font"
+    pushd /usr/share/fonts
+    wget https://github.com/ryanoasis/nerd-fonts/releases/download/v3.0.2/JetBrainsMono.zip
+    unzip JetBrainsMono.zip
+    rm JetBrainsMono.zip
+    popd
+    log_ok "DONE"
+}
+
 # Main function to run all program
 main() {
     prep_env
@@ -343,6 +353,7 @@ main() {
     set_user
     my_configuration
     my_custom_progs
+    set_fonts
 
 
     log_ok "DONE"
