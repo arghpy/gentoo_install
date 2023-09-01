@@ -20,7 +20,7 @@ app-editors/neovim
 app-editors/vim
 sys-process/htop
 media-sound/alsa-utils
-www-client/firefox-bin
+www-client/firefox
 #fonts
 media-fonts/jetbrains-mono
 #others
