@@ -36,48 +36,48 @@ check_internet() {
 # Selecting the disk to install on
 disks() {
     log_info "Select installation disk"
-	OPT=$(whiptail --title "Disks" --inputbox "Choose an option(1/2/3/4....) with the disk to install to:\\n$(lsblk -d -n | grep -v "loop" | awk '{print $1, $4}' | nl -s ")   " ) \\nPlease be careful because this operation is not reversible." 10 60 3>&1 1>&2 2>&3 3>&1 )
-	OPTIONS=$(lsblk -d -n | grep -v "loop" | awk '{print $1, $4}' | nl | awk '{print $1}')
+    LIST="$(lsblk -d -n | grep -v "loop" | awk '{print $1, $4}' | nl -s") ")"
+    echo "${LIST}"
+    OPTION=""
+
+    while [[ -z "$(echo "${LIST}" | grep "  ${OPTION})")" ]]; do
+        printf "Choose a disk (e.g.: 1): "
+        read OPTION
+    done
+
+    DISK="$(echo "${LIST}" | grep "  ${OPTION})" | awk '{print $2}')"
+
     log_ok "DONE"
 }
 
 # Creating partitions
 partitioning() {
     log_info "Partitioning disk"
-    if [[ -n $(echo $OPTIONS | grep $OPT 2>/dev/null) ]]; then
+    if [[ -n $(ls /sys/firmware/efi/efivars 2>/dev/null) ]];then
 
-        DISK=$(lsblk -d -n | grep -v "loop" | awk '{print $1}' | awk ' NR == '$OPT' {print }')
+        MODE="UEFI"
 
-        if [[ -n $(ls /sys/firmware/efi/efivars 2>/dev/null) ]];then
+        parted --script /dev/"${DISK}" mklabel gpt
 
-            MODE="UEFI"
+        parted --script /dev/"${DISK}" mkpart fat32 2048s 1GiB
+        parted --script /dev/"${DISK}" set 1 esp on
 
-            parted --script /dev/"${DISK}" mklabel gpt
-
-            parted --script /dev/"${DISK}" mkpart fat32 2048s 1GiB
-            parted --script /dev/"${DISK}" set 1 esp on
-
-            parted --script /dev/"${DISK}" mkpart linux-swap 1GiB 5GiB
-            parted --script /dev/"${DISK}" mkpart ext4 5GiB 35GiB
-            parted --script /dev/"${DISK}" mkpart ext4 35GiB 100%
-            parted --script /dev/"${DISK}" align-check optimal 1 
-        else
-
-            MODE="BIOS"
-
-            parted --script /dev/"${DISK}" mklabel msdos
-            parted --script /dev/"${DISK}" mkpart primary ext4 2048s 35GiB
-            parted --script /dev/"${DISK}" mkpart primary linux-swap 35GiB 39GiB
-            parted --script /dev/"${DISK}" mkpart primary ext4 39GiB 100%
-            parted --script /dev/"${DISK}" align-check optimal 1 
-        fi
-
-        log_ok "DONE"
-
+        parted --script /dev/"${DISK}" mkpart linux-swap 1GiB 5GiB
+        parted --script /dev/"${DISK}" mkpart ext4 5GiB 35GiB
+        parted --script /dev/"${DISK}" mkpart ext4 35GiB 100%
+        parted --script /dev/"${DISK}" align-check optimal 1 
     else
-        log_error "Wrong option. Aborting..."
-        exit -1
+
+        MODE="BIOS"
+
+        parted --script /dev/"${DISK}" mklabel msdos
+        parted --script /dev/"${DISK}" mkpart primary ext4 2048s 35GiB
+        parted --script /dev/"${DISK}" mkpart primary linux-swap 35GiB 39GiB
+        parted --script /dev/"${DISK}" mkpart primary ext4 39GiB 100%
+        parted --script /dev/"${DISK}" align-check optimal 1 
     fi
+
+    log_ok "DONE"
 
 }
 
@@ -86,7 +86,7 @@ partitioning() {
 formatting() {
 
     log_info "Formatting partitions"
-    PARTITIONS=$(lsblk --list --noheadings /dev/"$DISK" | tail -n +2 | awk '{print $1}')
+    PARTITIONS=$(lsblk --list --noheadings /dev/"${DISK}" | tail -n +2 | awk '{print $1}')
 
     if [[ "${MODE}" == "UEFI" ]]; then
 
@@ -155,7 +155,7 @@ make_conf_portage() {
     MAKE_CONF="/mnt/gentoo/etc/portage/make.conf"
 
     COMMON_FLAGS_OLD="$(grep "^COMMON_FLAGS=" "${MAKE_CONF}")"
-    COMMON_FLAGS_NEW="COMMON_FLAGS=\"-march=native -O2 -pipe\""
+    COMMON_FLAGS_NEW='COMMON_FLAGS="-march=native -O2 -pipe"'
     CORES="$(nproc)"
     MAKEOPTS="MAKEOPTS=\"-j${CORES}\""
     USE='USE="X postproc dbus acl alsa grub pulseaudio networkmanager -gnome -kde"'

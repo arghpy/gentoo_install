@@ -20,7 +20,7 @@ app-editors/neovim
 app-editors/vim
 sys-process/htop
 media-sound/alsa-utils
-www-client/firefox
+www-client/firefox-bin
 #fonts
 media-fonts/jetbrains-mono
 #others
@@ -37,6 +37,8 @@ net-wireless/bluez
 dev-vcs/git
 app-admin/sudo
 app-shells/zsh
+app-shells/zsh-completions
+app-shells/gentoo-zsh-completions
 sys-apps/dbus
 media-sound/pulseaudio
 x11-apps/setxkbmap

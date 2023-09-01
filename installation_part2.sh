@@ -149,8 +149,6 @@ generate_hostname() {
 # Enable networking
 enable_network() {
     log_info "Enable networking"
-    #emerge --quiet net-misc/dhcpcd
-    #rc-update add dhcpcd default
     emerge --quiet net-misc/networkmanager
     for x in /etc/runlevels/default/net.* ; do rc-update del $(basename $x) default ; rc-service --ifstarted $(basename $x) stop; done
     rc-update del dhcpcd default
@@ -221,7 +219,7 @@ install_packages() {
 }
 
 # Installing grub and creating configuration
-grub() {
+grub_configuration() {
     log_info "Installing and configuring grub"
 	if [[ "${MODE}" == "UEFI" ]]; then
         echo 'GRUB_PLATFORMS="efi-64"' >> /etc/portage/make.conf
@@ -252,7 +250,7 @@ set_user() {
     done
 
     log_info "Adding user to users, audio, video and wheel group"
-	useradd -m -G wheel,users,audio,video -s /bin/zsh "${NAME}"
+	useradd -m -G wheel,users,audio,video -s /bin/bash "${NAME}"
 
     log_info "Adding wheel to sudoers"
     grep -q "^%wheel" /etc/sudoers && \
@@ -340,6 +338,8 @@ set_fonts() {
 main() {
     prep_env
     mount_boot
+    change_root_password
+    set_user
     configure_portage
     setting_timezone
     configure_locales
@@ -347,11 +347,9 @@ main() {
     generate_fstab
     generate_hostname
     enable_network
-    change_root_password
     install_tools
     install_packages
-    grub
-    set_user
+    grub_configuration
     my_configuration
     my_custom_progs
     set_fonts
