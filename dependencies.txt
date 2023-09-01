@@ -38,3 +38,4 @@ dev-vcs/git
 app-admin/sudo
 app-shells/zsh
 sys-apps/dbus
+media-sound/pulseaudio
