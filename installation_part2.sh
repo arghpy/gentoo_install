@@ -252,7 +252,7 @@ set_user() {
     done
 
     log_info "Adding user to users, audio, video and wheel group"
-	useradd -m -G wheel,users,audio,video,plugdev -s /bin/zsh "${NAME}"
+	useradd -m -G wheel,users,audio,video -s /bin/zsh "${NAME}"
 
     log_info "Adding wheel to sudoers"
     grep -q "^%wheel" /etc/sudoers && \
@@ -322,6 +322,7 @@ my_custom_progs() {
     chown -R  "${NAME}":wheel /home/"${NAME}"/* /home/"${NAME}"/.*
 
     rc-update add elogind boot
+    usermod -aG plugdev "${NAME}"
     log_ok "DONE"
 }
 
