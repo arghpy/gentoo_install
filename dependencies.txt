@@ -40,3 +40,4 @@ media-fonts/jetbrains-mono
 dev-vcs/git
 #app-admin/sudo
 app-shells/zsh
+sys-apps/dbus
