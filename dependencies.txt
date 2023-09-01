@@ -39,3 +39,4 @@ app-admin/sudo
 app-shells/zsh
 sys-apps/dbus
 media-sound/pulseaudio
+x11-apps/setxkbmap
