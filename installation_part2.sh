@@ -121,7 +121,7 @@ configure_and_install_kernel() {
 
     log_info "Installing the kernel"
     emerge --quiet sys-kernel/installkernel-gentoo
-    emerge --quiet sys-kernel/gentoo-kernel-bin
+    emerge --quiet sys-kernel/gentoo-kernel
     log_ok "DONE"
 
     log_info "Cleaning up"
