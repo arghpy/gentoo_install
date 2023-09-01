@@ -44,11 +44,11 @@ configure_portage() {
     log_ok "DONE"
 
     log_info "Updating the @world set"
-    emerge --verbose --update --deep --newuse @world
+    emerge --quiet --update --deep --newuse @world
     log_ok "DONE"
 
     log_info "Configuring CPU_FLAGS"
-    emerge -q app-portage/cpuid2cpuflags
+    emerge --quiet app-portage/cpuid2cpuflags
     echo "*/* $(cpuid2cpuflags)" > /etc/portage/package.use/00cpu-flags
     log_ok "DONE"
 
@@ -60,7 +60,7 @@ configure_portage() {
         echo 'VIDEO_CARDS="intel"' >> /etc/portage/make.conf
     elif [ -n "$(echo "${GPU}" | grep -i nvidia)" ]; then 
         echo 'VIDEO_CARDS="nouveau"' >> /etc/portage/make.conf
-        emerge -q x11-drivers/nvidia-drivers
+        emerge --quiet x11-drivers/nvidia-drivers
     elif [ -n "$(echo "${GPU}" | grep -i amd)" ]; then 
         echo 'VIDEO_CARDS="radeon"' >> /etc/portage/make.conf
     fi
@@ -112,16 +112,16 @@ configure_and_install_kernel() {
 
 
     log_info "Installing linux-firmware"
-    emerge -q sys-kernel/linux-firmware
+    emerge --quiet sys-kernel/linux-firmware
     if [ -n "$(lscpu | grep "^Model name" | grep -i intel)" ]; then
-        emerge -q sys-firmware/intel-microcode
-        emerge -q x11-drivers/xf86-video-intel
+        emerge --quiet sys-firmware/intel-microcode
+        emerge --quiet x11-drivers/xf86-video-intel
     fi
     log_ok "DONE"
 
     log_info "Installing the kernel"
-    emerge -q sys-kernel/installkernel-gentoo
-    emerge -q sys-kernel/gentoo-kernel-bin
+    emerge --quiet sys-kernel/installkernel-gentoo
+    emerge --quiet sys-kernel/gentoo-kernel-bin
     log_ok "DONE"
 
     log_info "Cleaning up"
@@ -134,7 +134,7 @@ configure_and_install_kernel() {
 # Generating the fstab
 generate_fstab() {
     log_info "Generating the fstab"
-    emerge -q sys-fs/genfstab
+    emerge --quiet sys-fs/genfstab
     genfstab -U / >> /etc/fstab
     log_ok "DONE"
 }
@@ -149,8 +149,13 @@ generate_hostname() {
 # Enable networking
 enable_network() {
     log_info "Enable networking"
-    emerge -q net-misc/dhcpcd
-    rc-update add dhcpcd default
+    #emerge --quiet net-misc/dhcpcd
+    #rc-update add dhcpcd default
+    emerge --quiet net-misc/networkmanager
+    for x in /etc/runlevels/default/net.* ; do rc-update del $(basename $x) default ; rc-service --ifstarted $(basename $x) stop; done
+    rc-update del dhcpcd default
+    rc-service NetworkManager start
+    rc-update add NetworkManager default
     log_ok "DONE"
 }
 
@@ -167,17 +172,17 @@ change_root_password() {
 install_tools() {
     log_info "Installing tools"
     log_info "system logger"
-    emerge -q app-admin/sysklogd
+    emerge --quiet app-admin/sysklogd
     rc-update add sysklogd default
     log_ok "DONE"
 
     log_info "Cron daemon"
-    emerge -q sys-process/cronie
+    emerge --quiet sys-process/cronie
     rc-update add cronie default
     log_ok "DONE"
 
     log_info "File indexing"
-    emerge -q sys-apps/mlocate
+    emerge --quiet sys-apps/mlocate
     log_ok "DONE"
 
     log_info "enabling sshd"
@@ -185,20 +190,20 @@ install_tools() {
     log_ok "DONE"
 
     log_info "bash completion"
-    emerge -q app-shells/bash-completion
+    emerge --quiet app-shells/bash-completion
     log_ok "DONE"
 
     log_info "Time Synchronization"
-    emerge -q net-misc/chrony
+    emerge --quiet net-misc/chrony
     rc-update add chronyd default
     log_ok "DONE"
 
     log_info "udev scheduler"
-    emerge -q sys-block/io-scheduler-udev-rules
+    emerge --quiet sys-block/io-scheduler-udev-rules
     log_ok "DONE"
 
     log_info "Wireless tools"
-    emerge -q net-wireless/iw net-wireless/wpa_supplicant
+    emerge --quiet net-wireless/iw net-wireless/wpa_supplicant
     log_ok "DONE"
     log_ok "DONE"
 }
@@ -207,7 +212,7 @@ install_tools() {
 install_packages() {
     log_info "Install packages"
     log_info "Installing rust-bin"
-    emerge -q rust-bin
+    emerge --quiet rust-bin
     log_ok "DONE"
     wget "${DEP_FILE}"
     DEPLIST="$(cat dependencies.txt | grep -v "#" | paste -sd" ")"
@@ -220,11 +225,11 @@ grub() {
     log_info "Installing and configuring grub"
 	if [[ "${MODE}" == "UEFI" ]]; then
         echo 'GRUB_PLATFORMS="efi-64"' >> /etc/portage/make.conf
-        emerge -q sys-boot/grub
+        emerge --quiet sys-boot/grub
         grub-install --target=x86_64-efi --efi-directory=/boot
 		grub-mkconfig -o /boot/grub/grub.cfg
 	elif [[ "${MODE}" == "BIOS" ]]; then
-        emerge -q --verbose sys-boot/grub
+        emerge --quiet sys-boot/grub
 		grub-install /dev/"${DISK}"
 		grub-mkconfig -o /boot/grub/grub.cfg
 	else
@@ -247,7 +252,7 @@ set_user() {
     done
 
     log_info "Adding user to users, audio, video and wheel group"
-	useradd -m -G wheel,users,audio,video -s /bin/zsh "${NAME}"
+	useradd -m -G wheel,users,audio,video,plugdev -s /bin/zsh "${NAME}"
 
     log_info "Adding wheel to sudoers"
     grep -q "^%wheel" /etc/sudoers && \
@@ -315,6 +320,8 @@ my_custom_progs() {
     done
 
     chown -R  "${NAME}":wheel /home/"${NAME}"/* /home/"${NAME}"/.*
+
+    rc-update add elogind boot
     log_ok "DONE"
 }
 
