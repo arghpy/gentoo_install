@@ -88,10 +88,10 @@ configure_locales() {
     locale-gen
     
     # create file
-    echo "LANG=\"en_US.UTF-8\"" > /etc/env.d/02locale
+    echo 'LANG="en_US.UTF-8"' > /etc/env.d/02locale
     
     # append to file
-    echo "LC_COLLATE=\"en_US.UTF-8\"" >> /etc/env.d/02locale
+    echo 'LC_COLLATE="en_US.UTF-8"' >> /etc/env.d/02locale
 
     env-update && source /etc/profile && export PS1="(chroot) ${PS1}"
 
@@ -101,8 +101,6 @@ configure_locales() {
 # Configure and install kernel
 configure_and_install_kernel() {
     log_info "Configure and install kernel"
-    mount_boot
-
     # create file
     echo "# Accepting the license for linux-firmware" > /etc/portage/package.license
 
@@ -135,7 +133,6 @@ configure_and_install_kernel() {
 
 # Generating the fstab
 generate_fstab() {
-    mount_boot
     log_info "Generating the fstab"
     emerge -q sys-fs/genfstab
     genfstab -U / >> /etc/fstab
@@ -145,7 +142,7 @@ generate_fstab() {
 # Generate hostname
 generate_hostname() {
     log_info "Generate hostname"
-    echo gentoo > /etc/hostname
+    echo "gentoo" > /etc/hostname
     log_ok "DONE"
 }
 
@@ -154,7 +151,6 @@ enable_network() {
     log_info "Enable networking"
     emerge -q net-misc/dhcpcd
     rc-update add dhcpcd default
-    rc-service dhcpcd start
     log_ok "DONE"
 }
 
@@ -210,6 +206,9 @@ install_tools() {
 # Install packages
 install_packages() {
     log_info "Install packages"
+    log_info "Installing rust-bin"
+    emerge -q rust-bin
+    log_ok "DONE"
     wget "${DEP_FILE}"
     DEPLIST="$(cat dependencies.txt | grep -v "#" | paste -sd" ")"
     emerge --autounmask-continue -q ${DEPLIST}
@@ -219,7 +218,6 @@ install_packages() {
 # Installing grub and creating configuration
 grub() {
     log_info "Installing and configuring grub"
-    mount_boot 
 	if [[ "${MODE}" == "UEFI" ]]; then
         echo 'GRUB_PLATFORMS="efi-64"' >> /etc/portage/make.conf
         emerge -q sys-boot/grub
@@ -249,14 +247,13 @@ set_user() {
     done
 
     log_info "Adding user to users, audio, video and wheel group"
-	useradd -m -G wheel,users,audio,video -s /bin/bash "${NAME}"
+	useradd -m -G wheel,users,audio,video -s /bin/zsh "${NAME}"
 
     log_info "Adding wheel to sudoers"
-    echo "%wheel ALL=(ALL:ALL) ALL" >> /etc/sudoers
+    grep -q "^%wheel" /etc/sudoers && \
+        echo "%wheel ALL=(ALL:ALL) ALL" >> /etc/sudoers
 
     log_info "Setting up user password"
-	printf "\n\nEnter password for %s\n\n" "$NAME"
-
     while ! passwd "${NAME}"; do
         sleep 1
     done
@@ -265,7 +262,7 @@ set_user() {
 }
 
 # Move configuration files in user home
-move_dotfiles() {
+my_configuration() {
     log_info "Configuring the user's home directory"
     CONFIG_GIT="https://github.com/arghpy/dotfiles"
     rm -rf /home/"${NAME}"/* 
@@ -279,42 +276,52 @@ move_dotfiles() {
 }
 
 # Copy custom dwm suite and neovim config
-other_progs() {
+my_custom_progs() {
     mkdir --parents /home/"${NAME}"/.local/src/
     mkdir --parents /home/"${NAME}"/.config
     log_info "Cloning dwm in .local/src"
     git -C /home/"${NAME}"/.local/src/ clone "https://github.com/arghpy/dwm"
+    rm -rf /home/"${NAME}"/.local/src/dwm/.git
     log_ok "DONE"
 
     log_info "Cloning dwmblocks in .local/src"
     git -C /home/"${NAME}"/.local/src/ clone "https://github.com/arghpy/dwmblocks"
+    rm -rf /home/"${NAME}"/.local/src/dwmblocks/.git
+    log_ok "DONE"
+
+    log_info "Cloning st in .local/src"
+    git -C /home/"${NAME}"/.local/src/ clone "https://github.com/arghpy/st"
+    rm -rf /home/"${NAME}"/.local/src/st/.git
     log_ok "DONE"
 
     log_info "Cloning nvim in .config"
     git -C /home/"${NAME}"/.config/ clone "https://github.com/arghpy/nvim_config"
     mv /home/"${NAME}"/.config/nvim_config/* /home/"${NAME}"/.config/
     rm -rf /home/"${NAME}"/.config/nvim_config
+    rm -rf /home/"${NAME}"/.config/.git
     log_ok "DONE"
 
     log_info "Modifying config settings for the local user"
-    for i in $(grep -r "arghpy" /home/"${NAME}"/* 2>/dev/null | awk -F ':' '{print $1}'); do
+    for i in $(grep -rl "arghpy" /home/"${NAME}"/.* /home/"${NAME}"/* 2>/dev/null); do
         sed -i "s|arghpy|${NAME}|g" "${i}"
     done
     log_ok "DONE"
 
     log_info "Compiling sources in .local/src/"
-    for i in $(ls -ld /home/"${NAME}"/.local/src/* | awk '{print $NF}' | grep -v "yay\|lf\|icons");do
-        cd "${i}"
+    for i in $(ls -d /home/"${NAME}"/.local/src/*);do
+        pushd "${i}"
         make clean install
+        popd
     done
 
-    chown -R  "${NAME}":wheel /home/"${NAME}"/*
+    chown -R  "${NAME}":wheel /home/"${NAME}"/* /home/"${NAME}"/.*
     log_ok "DONE"
 }
 
 # Main function to run all program
 main() {
     prep_env
+    mount_boot
     configure_portage
     setting_timezone
     configure_locales
@@ -324,11 +331,11 @@ main() {
     enable_network
     change_root_password
     install_tools
-    #install_packages
+    install_packages
     grub
     set_user
-    #move_dotfiles
-    #other_progs
+    my_configuration
+    my_custom_progs
 
 
     log_ok "DONE"
