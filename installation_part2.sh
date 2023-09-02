@@ -214,7 +214,7 @@ install_packages() {
     log_ok "DONE"
     wget "${DEP_FILE}"
     DEPLIST="$(cat dependencies.txt | grep -v "#" | paste -sd" ")"
-    emerge --autounmask-continue -q ${DEPLIST}
+    emerge --autounmask-continue --quiet ${DEPLIST}
     log_ok "DONE"
 }
 
