@@ -158,7 +158,7 @@ make_conf_portage() {
     COMMON_FLAGS_NEW='COMMON_FLAGS="-march=native -O2 -pipe"'
     CORES="$(nproc)"
     MAKEOPTS="MAKEOPTS=\"-j${CORES}\""
-    USE='USE="X postproc dbus acl alsa grub pulseaudio networkmanager -gnome -kde"'
+    USE='USE="X minimal postproc dbus acl alsa grub pulseaudio networkmanager -gnome -kde"'
 
     # Changing COMMON_FLAGS
     sed -i "s|${COMMON_FLAGS_OLD}|${COMMON_FLAGS_NEW}|g" "${MAKE_CONF}"
