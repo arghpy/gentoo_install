@@ -331,6 +331,9 @@ my_custom_progs() {
 
     rc-update add elogind boot
     usermod -s /bin/zsh -aG plugdev "${NAME}"
+    CORES="$(nproc)"
+    NEW_CORES="$((CORES / 2))"
+    sed -E -i "s|MAKEOPTS=.*|MAKEOPTS=\"-j${NEW_CORES}\"|g"
     log_ok "DONE"
 }
 
