@@ -140,7 +140,7 @@ download_and_configure_stage3() {
     pushd /mnt/gentoo
 
     wget "${STAGE}"
-    tar xpvf stage3-*.tar.xz --xattrs-include='*.*' --numeric-owner
+    tar xpf stage3-*.tar.xz --xattrs-include='*.*' --numeric-owner
     rm stage3-*.tar.xz
 
     popd
