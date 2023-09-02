@@ -21,8 +21,6 @@ app-editors/vim
 sys-process/htop
 media-sound/alsa-utils
 www-client/firefox-bin
-#fonts
-media-fonts/jetbrains-mono
 #others
 media-gfx/maim
 xfce-base/thunar
