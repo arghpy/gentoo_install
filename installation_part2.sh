@@ -264,8 +264,7 @@ set_user() {
 	useradd -m -G wheel,users,audio,video -s /bin/bash "${NAME}"
 
     log_info "Adding wheel to sudoers"
-    grep -q "^%wheel" /etc/sudoers && \
-        echo "%wheel ALL=(ALL:ALL) ALL" >> /etc/sudoers
+    echo "%wheel ALL=(ALL:ALL) ALL" >> /etc/sudoers
 
     log_info "Setting up user password"
     while ! passwd "${NAME}"; do
