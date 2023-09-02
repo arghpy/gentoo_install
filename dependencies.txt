@@ -42,3 +42,4 @@ app-shells/gentoo-zsh-completions
 sys-apps/dbus
 media-sound/pulseaudio
 x11-apps/setxkbmap
+dev-libs/cxxopts
