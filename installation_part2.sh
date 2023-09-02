@@ -218,6 +218,17 @@ install_packages() {
     log_ok "DONE"
 }
 
+# Install pamixer
+install_pamixer() {
+    log_info "Installing pamixer"
+    git clone https://github.com/cdemoulins/pamixer
+    pushd pamixer
+    meson setup build
+    meson compile -C build
+    meson install -C build
+    log_ok "DONE"
+}
+
 # Installing grub and creating configuration
 grub_configuration() {
     log_info "Installing and configuring grub"
@@ -334,6 +345,13 @@ set_fonts() {
     log_ok "DONE"
 }
 
+# Clean up
+clean_up() {
+    log_info "Clean up"
+    rm -f dependencies.txt log_functions.sh
+    log_ok "DONE"
+}
+
 # Main function to run all program
 main() {
     prep_env
@@ -349,11 +367,12 @@ main() {
     enable_network
     install_tools
     install_packages
+    install_pamixer
     grub_configuration
     my_configuration
     my_custom_progs
     set_fonts
-
+    clean_up
 
     log_ok "DONE"
     log_info "Exit the chroot now 'exit' and reboot"
