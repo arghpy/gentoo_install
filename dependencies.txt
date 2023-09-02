@@ -25,7 +25,7 @@ www-client/firefox-bin
 media-fonts/jetbrains-mono
 #others
 media-gfx/maim
-x11-misc/pcmanfm-qt
+xfce-base/thunar
 media-gfx/sxiv
 media-video/vlc
 sys-devel/bc
