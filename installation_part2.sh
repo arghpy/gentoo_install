@@ -347,7 +347,7 @@ set_fonts() {
 # Clean up
 clean_up() {
     log_info "Clean up"
-    rm -f dependencies.txt log_functions.sh
+    rm -rf /dependencies.txt /log_functions.sh /pamixer
     log_ok "DONE"
 }
 
