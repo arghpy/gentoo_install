@@ -331,7 +331,7 @@ my_custom_progs() {
     chown -R  "${NAME}":wheel /home/"${NAME}"/* /home/"${NAME}"/.*
 
     rc-update add elogind boot
-    usermod -aG plugdev "${NAME}"
+    usermod -s /bin/zsh -aG plugdev "${NAME}"
     log_ok "DONE"
 }
 
