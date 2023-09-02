@@ -113,7 +113,7 @@ configure_and_install_kernel() {
 
     log_info "Installing linux-firmware"
     emerge --quiet sys-kernel/linux-firmware
-    if [ -n "$(lscpu | grep "^Model name" | grep -i intel)" ]; then
+    if $(lscpu | grep "^Model name" | grep -i intel); then
         emerge --quiet sys-firmware/intel-microcode
         emerge --quiet x11-drivers/xf86-video-intel
     fi
@@ -121,7 +121,7 @@ configure_and_install_kernel() {
 
     log_info "Installing the kernel"
     emerge --quiet sys-kernel/installkernel-gentoo
-    emerge --quiet sys-kernel/gentoo-kernel-bin
+    emerge --quiet sys-kernel/gentoo-kernel
     log_ok "DONE"
 
     log_info "Cleaning up"
