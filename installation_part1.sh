@@ -63,8 +63,8 @@ partitioning() {
         parted --script /dev/"${DISK}" mkpart fat32 2048s 1GiB
         parted --script /dev/"${DISK}" set 1 esp on
 
-        parted --script /dev/"${DISK}" mkpart linux-swap 1GiB "$(echo "scale=1;${SWAP_MEM} + 1" | bc)"GiB
-        parted --script /dev/"${DISK}" mkpart ext4 "$(echo "scale=1;${SWAP_MEM} + 1" | bc)"GiB 35GiB
+        parted --script /dev/"${DISK}" mkpart linux-swap 1GiB "$((SWAP_MEM + 1))"GiB
+        parted --script /dev/"${DISK}" mkpart ext4 "$((SWAP_MEM + 1))"GiB 35GiB
         parted --script /dev/"${DISK}" mkpart ext4 35GiB 100%
         parted --script /dev/"${DISK}" align-check optimal 1 
     else
@@ -73,8 +73,8 @@ partitioning() {
 
         parted --script /dev/"${DISK}" mklabel msdos
         parted --script /dev/"${DISK}" mkpart primary ext4 2048s 35GiB
-        parted --script /dev/"${DISK}" mkpart primary linux-swap 35GiB "$(echo "scale=1;${SWAP_MEM} + 35" | bc)"GiB
-        parted --script /dev/"${DISK}" mkpart primary ext4 "$(echo "scale=1;${SWAP_MEM} + 35" | bc)"GiB 100%
+        parted --script /dev/"${DISK}" mkpart primary linux-swap 35GiB "$((SWAP_MEM + 35))"GiB
+        parted --script /dev/"${DISK}" mkpart primary ext4 "$((SWAP_MEM + 35))"GiB 100%
         parted --script /dev/"${DISK}" align-check optimal 1 
     fi
 
