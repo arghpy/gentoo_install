@@ -56,12 +56,12 @@ configure_portage() {
 
     GPU="$(lspci | grep VGA)"
 
-    if $(echo "${GPU}" | grep -i intel); then
+    if [ "$(echo "${GPU}" | grep -q -i intel)" -eq 0 ]; then
         echo 'VIDEO_CARDS="intel"' >> /etc/portage/make.conf
-    elif $(echo "${GPU}" | grep -i nvidia); then 
+    elif [ "$(echo "${GPU}" | grep -q -i nvidia)" -eq 0 ]; then 
         echo 'VIDEO_CARDS="nouveau"' >> /etc/portage/make.conf
         emerge --quiet x11-drivers/nvidia-drivers
-    elif $(echo "${GPU}" | grep -i amd); then 
+    elif [ "$(echo "${GPU}" | grep -q -i amd)" -eq 0 ]; then 
         echo 'VIDEO_CARDS="radeon"' >> /etc/portage/make.conf
     fi
 
@@ -113,7 +113,7 @@ configure_and_install_kernel() {
 
     log_info "Installing linux-firmware"
     emerge --quiet sys-kernel/linux-firmware
-    if $(lscpu | grep "^Model name" | grep -i intel); then
+    if [ "$(lscpu | grep "^Model name" | grep -q -i intel)" -eq 0 ]; then
         emerge --quiet sys-firmware/intel-microcode
         emerge --quiet x11-drivers/xf86-video-intel
     fi
