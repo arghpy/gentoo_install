@@ -91,7 +91,7 @@ configure_locales() {
     echo 'LANG="en_US.UTF-8"' > /etc/env.d/02locale
     
     # append to file
-    echo 'LC_COLLATE="en_US.UTF-8"' >> /etc/env.d/02locale
+    echo 'LC_COLLATE="en_US.UTF-8"' > /etc/env.d/02locale
 
     env-update && source /etc/profile && export PS1="(chroot) ${PS1}"
 
