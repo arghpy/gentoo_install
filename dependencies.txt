@@ -41,3 +41,8 @@ sys-apps/dbus
 media-sound/pulseaudio
 x11-apps/setxkbmap
 dev-libs/cxxopts
+media-video/ffmpeg
+media-libs/x264
+media-libs/x265
+media-libs/fontconfig
+media-libs/freetype
