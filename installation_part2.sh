@@ -323,14 +323,14 @@ my_custom_progs() {
     log_ok "DONE"
 
     log_info "Modifying config settings for the local user"
-    # shellcheck disbale=SC2013
+    # shellcheck disable=SC2013
     for i in $(grep -rl "arghpy" /home/"${NAME}"/.* /home/"${NAME}"/* 2>/dev/null); do
         sed -i "s|arghpy|${NAME}|g" "${i}"
     done
     log_ok "DONE"
 
     log_info "Compiling sources in .local/src/"
-    # shellcheck disbale=SC2045
+    # shellcheck disable=SC2045
     for i in $(ls -d /home/"${NAME}"/.local/src/*);do
         pushd "${i}" || exit 1
         make clean install
