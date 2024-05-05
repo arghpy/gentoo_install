@@ -5,11 +5,12 @@ SECOND_SCRIPT="https://raw.githubusercontent.com/arghpy/gentoo_install/main/inst
 
 # Sourcing log functions
 wget "${LOG_FUNC}"
+# shellcheck disable=SC1091
 if source log_functions.sh; then
     log_info "sourced log_functions.sh"
 else
     echo "Error! Could not source log_functions.sh"
-    exit -1
+    exit 1
 fi
 
 # Downloading the second part of installation
@@ -17,7 +18,7 @@ if wget "${SECOND_SCRIPT}"; then
     log_info "Downloaded the second part of the installation"
 else
     log_error "Couldn't download the second part of the installation. Aborting..."
-    exit -1
+    exit 1
 fi
 
 # Check for internet
@@ -27,7 +28,7 @@ check_internet() {
         log_error "No Internet Connection"
         log_info "Visit https://wiki.gentoo.org/wiki/Handbook:AMD64/Installation/Networking"
         log_info "Optionally use 'links https://wiki.gentoo.org/wiki/Handbook:AMD64/Installation/Networking'"
-        exit -1
+        exit 1
     else
         log_ok "Connected to internet"
 	fi
@@ -40,9 +41,10 @@ disks() {
     echo "${LIST}"
     OPTION=""
 
+    # shellcheck disable=SC2143
     while [[ -z "$(echo "${LIST}" | grep "  ${OPTION})")" ]]; do
         printf "Choose a disk (e.g.: 1): "
-        read OPTION
+        read -r OPTION
     done
 
     DISK="$(echo "${LIST}" | grep "  ${OPTION})" | awk '{print $2}')"
@@ -137,13 +139,13 @@ download_and_configure_stage3() {
     log_info "Downloading and setting stage3 tarball"
     STAGE="https://distfiles.gentoo.org/releases/amd64/autobuilds/20230827T170145Z/stage3-amd64-openrc-20230827T170145Z.tar.xz"
 
-    pushd /mnt/gentoo
+    pushd /mnt/gentoo || exit 1
 
     wget "${STAGE}"
     tar xpf stage3-*.tar.xz --xattrs-include='*.*' --numeric-owner
     rm stage3-*.tar.xz
 
-    popd
+    popd || exit 1
 
     log_ok "DONE"
 }
