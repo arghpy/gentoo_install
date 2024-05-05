@@ -8,11 +8,12 @@ DEP_FILE="https://raw.githubusercontent.com/arghpy/gentoo_install/main/dependenc
 
 # Sourcing log functions
 wget "${LOG_FUNC}"
+# shellcheck disable=SC1091
 if source log_functions.sh; then
     log_info "sourced log_functions.sh"
 else
     echo "Error! Could not source log_functions.sh"
-    exit -1
+    exit 1
 fi
 
 # Preparing environment
@@ -106,6 +107,7 @@ configure_and_install_kernel() {
     echo "# Accepting the license for linux-firmware" > /etc/portage/package.license
 
     # append to file
+    # shellcheck disable=SC2129
     echo "sys-kernel/linux-firmware linux-fw-redistributable" >> /etc/portage/package.license
     echo "" >> /etc/portage/package.license
     echo "# Accepting any license that permits redistribution" >> /etc/portage/package.license
@@ -151,7 +153,10 @@ generate_hostname() {
 enable_network() {
     log_info "Enable networking"
     emerge --quiet net-misc/networkmanager
-    for x in /etc/runlevels/default/net.* ; do rc-update del $(basename $x) default ; rc-service --ifstarted $(basename $x) stop; done
+    for x in /etc/runlevels/default/net.* ; do
+      rc-update del "$(basename "$x")" default
+      rc-service --ifstarted "$(basename "$x")" stop
+    done
     rc-update del dhcpcd default
     rc-service NetworkManager start
     rc-update add NetworkManager default
@@ -214,7 +219,8 @@ install_packages() {
     emerge --quiet rust-bin
     log_ok "DONE"
     wget "${DEP_FILE}"
-    DEPLIST="$(cat dependencies.txt | grep -v "#" | paste -sd" ")"
+    DEPLIST="$(grep -v "#" dependencies.txt | paste -sd" ")"
+    # shellcheck disable=SC2086
     emerge --autounmask-continue --quiet ${DEPLIST}
     log_ok "DONE"
 }
@@ -223,7 +229,7 @@ install_packages() {
 install_pamixer() {
     log_info "Installing pamixer"
     git clone https://github.com/cdemoulins/pamixer
-    pushd pamixer
+    pushd pamixer || exit 1
     meson setup build
     meson compile -C build
     meson install -C build
@@ -244,7 +250,7 @@ grub_configuration() {
 		grub-mkconfig -o /boot/grub/grub.cfg
 	else
 		log_error "An error occured at grub step. Exiting..."
-		exit -1
+		exit 1
 	fi
     log_ok "DONE"
 }
@@ -258,7 +264,7 @@ set_user() {
 
     while [ -z "${NAME}" ]; do
         printf "Enter name for the local user: "
-        read NAME
+        read -r NAME
     done
 
     log_info "Adding user to users, audio, video and wheel group"
@@ -279,6 +285,7 @@ set_user() {
 my_configuration() {
     log_info "Configuring the user's home directory"
     CONFIG_GIT="https://github.com/arghpy/dotfiles"
+    # shellcheck disable=SC2115
     rm -rf /home/"${NAME}"/* 
     rm -rf /home/"${NAME}"/.* 
     git -C /home/"${NAME}"/ clone "${CONFIG_GIT}"
@@ -316,16 +323,18 @@ my_custom_progs() {
     log_ok "DONE"
 
     log_info "Modifying config settings for the local user"
+    # shellcheck disbale=SC2013
     for i in $(grep -rl "arghpy" /home/"${NAME}"/.* /home/"${NAME}"/* 2>/dev/null); do
         sed -i "s|arghpy|${NAME}|g" "${i}"
     done
     log_ok "DONE"
 
     log_info "Compiling sources in .local/src/"
+    # shellcheck disbale=SC2045
     for i in $(ls -d /home/"${NAME}"/.local/src/*);do
-        pushd "${i}"
+        pushd "${i}" || exit 1
         make clean install
-        popd
+        popd || exit 1
     done
 
     chown -R  "${NAME}":wheel /home/"${NAME}"/* /home/"${NAME}"/.*
@@ -340,11 +349,11 @@ my_custom_progs() {
 
 set_fonts() {
     log_info "Setting JetBrains Mono Nerd Font"
-    pushd /usr/share/fonts
+    pushd /usr/share/fonts || exit 1
     wget https://github.com/ryanoasis/nerd-fonts/releases/download/v3.0.2/JetBrainsMono.zip
     unzip JetBrainsMono.zip
     rm JetBrainsMono.zip
-    popd
+    popd || exit 1
     log_ok "DONE"
 }
 
