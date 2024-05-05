@@ -1,3 +1,6 @@
-# gentoo_install
+# Gentoo install
 
-[![Super-Linter](https://github.com/arghpy/gentoo_install/actions/workflows/manage_pull_requests.yaml/badge.svg)](https://github.com/marketplace/actions/super-linter)
+This repository was made with the intention of providing a script for
+an automatic installation of gentoo, as much as possible.
+
+
